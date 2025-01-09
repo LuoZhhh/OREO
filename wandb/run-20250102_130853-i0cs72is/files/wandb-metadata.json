@@ -1,0 +1,139 @@
+{
+  "os": "Linux-5.15.0-78-generic-x86_64-with-glibc2.35",
+  "python": "CPython 3.11.3",
+  "startedAt": "2025-01-02T13:08:53.912232Z",
+  "args": [
+    "--local_rank=0",
+    "--save_path",
+    "/workspace/zihan/CODE/OpenRLHF/checkpoint/Llama3.1-8b-rl-0102",
+    "--save_steps",
+    "-1",
+    "--logging_steps",
+    "1",
+    "--eval_steps",
+    "-1",
+    "--train_batch_size",
+    "8",
+    "--micro_train_batch_size",
+    "1",
+    "--pretrain",
+    "/workspace/zihan/CODE/OpenRLHF/checkpoint/Llama3.1-8b-sft-1218",
+    "--bf16",
+    "--max_epochs",
+    "2",
+    "--max_len",
+    "16000",
+    "--zero_stage",
+    "2",
+    "--beta",
+    "0.03",
+    "--learning_rate",
+    "5e-6",
+    "--critic_learning_rate",
+    "5e-6",
+    "--adam_offload",
+    "--flash_attn",
+    "--gradient_checkpointing",
+    "--ref_offload",
+    "--dro_actor_loss",
+    "--rew_mul",
+    "1",
+    "--rew_add",
+    "0",
+    "--kl_reg",
+    "0.01",
+    "--unbiased_kl",
+    "--plot_weights",
+    "--padding_side",
+    "left",
+    "--packing_samples",
+    "--ring_attn_size",
+    "2",
+    "--ring_head_stride",
+    "2",
+    "--train_file",
+    "/workspace/zihan/CODE/mle-syn/save_data/12-31/OREO/MLInstruct_abs_rl.jsonl",
+    "--use_wandb",
+    "3d0e38b972f4b849c7e75d05b4d3d86b861de97f"
+  ],
+  "program": "/workspace/zihan/CODE/OREO/examples/train_pcl.py",
+  "codePath": "examples/train_pcl.py",
+  "git": {
+    "remote": "https://githubfast.com/LuoZhhh/OREO.git",
+    "commit": "f85a80adae41e9d8e71bbaf86c1739326ed99a33"
+  },
+  "email": "zihanluo@hust.edu.cn",
+  "root": "/workspace/zihan/CODE/OREO",
+  "host": "node056",
+  "username": "root",
+  "executable": "/usr/bin/python",
+  "codePathLocal": "examples/train_pcl.py",
+  "cpu_count": 64,
+  "cpu_count_logical": 128,
+  "gpu": "NVIDIA A100-SXM4-80GB",
+  "gpu_count": 8,
+  "disk": {
+    "/": {
+      "total": "942328844288",
+      "used": "369160925184"
+    }
+  },
+  "memory": {
+    "total": "1081877303296"
+  },
+  "cpu": {
+    "count": 64,
+    "countLogical": 128
+  },
+  "gpu_nvidia": [
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    },
+    {
+      "name": "NVIDIA A100-SXM4-80GB",
+      "memoryTotal": "85899345920",
+      "cudaCores": 6912,
+      "architecture": "Ampere"
+    }
+  ],
+  "cudaVersion": "12.3"
+}

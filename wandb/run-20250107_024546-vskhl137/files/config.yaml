@@ -1,0 +1,224 @@
+_wandb:
+    value:
+        cli_version: 0.19.0
+        m:
+            - "1": train/global_step
+              "6":
+                - 3
+              "7": []
+            - "1": eval/global_step
+              "6":
+                - 3
+              "7": []
+        python_version: 3.11.3
+        t:
+            "1":
+                - 1
+                - 2
+                - 3
+                - 5
+                - 11
+                - 30
+                - 49
+                - 51
+                - 53
+                - 55
+                - 71
+                - 98
+            "2":
+                - 1
+                - 2
+                - 3
+                - 5
+                - 11
+                - 30
+                - 49
+                - 51
+                - 53
+                - 55
+                - 71
+                - 98
+            "3":
+                - 7
+                - 13
+                - 16
+                - 23
+                - 55
+                - 66
+            "4": 3.11.3
+            "5": 0.19.0
+            "6": 4.46.3
+            "8":
+                - 2
+                - 5
+            "12": 0.19.0
+            "13": linux-x86_64
+actor_freeze_ratio:
+    value: null
+adam_offload:
+    value: true
+aux_loss_coef:
+    value: 0
+beta:
+    value: 0.03
+bf16:
+    value: true
+chosen_key:
+    value: null
+ckpt_path:
+    value: ./ckpt/checkpoints_dpo
+clip_log:
+    value: null
+critic_learning_rate:
+    value: 5e-07
+critic_only:
+    value: false
+disable_fast_tokenizer:
+    value: false
+disable_trace_cache:
+    value: false
+dro_actor_loss:
+    value: true
+ema_beta:
+    value: 0.995
+enable_ema:
+    value: false
+eval_steps:
+    value: -1
+fix_max_steps:
+    value: false
+flash_attn:
+    value: true
+forward_kl:
+    value: false
+grad_accum_dtype:
+    value: null
+gradient_checkpointing:
+    value: true
+gradient_checkpointing_use_reentrant:
+    value: false
+hinge_coeff:
+    value: null
+importance_sampling:
+    value: false
+importance_sampling_2:
+    value: false
+init_log_kl_coeff:
+    value: 0
+input_template:
+    value: |
+        Human:
+        {}
+        Assistant:
+ipo:
+    value: false
+kl_coeff_lr:
+    value: 0.001
+kl_reg:
+    value: 0.01
+kl_targ:
+    value: null
+l2:
+    value: 0
+label_smoothing:
+    value: 0
+learning_rate:
+    value: 5e-07
+load_actor:
+    value: /workspace/zihan/CODE/OpenRLHF/checkpoint/Llama3.1-8b-sft-1218
+load_checkpoint:
+    value: false
+load_critic:
+    value: null
+load_critic_adapter:
+    value: null
+load_in_4bit:
+    value: false
+local_rank:
+    value: 0
+logging_steps:
+    value: 1
+lora_alpha:
+    value: 64
+lora_dropout:
+    value: 0
+lora_rank:
+    value: 64
+max_ckpt_mem:
+    value: 1000
+max_ckpt_num:
+    value: 3
+max_epochs:
+    value: 2
+max_len:
+    value: 16000
+max_norm:
+    value: 1
+max_samples:
+    value: 20000
+micro_train_batch_size:
+    value: 1
+only_critic_lora:
+    value: true
+packing_samples:
+    value: true
+padding_side:
+    value: left
+period_as_delimiter:
+    value: false
+plot_weights:
+    value: true
+pretrain:
+    value: /workspace/zihan/CODE/OpenRLHF/checkpoint/Llama3.1-8b-sft-1218
+prompt_key:
+    value: null
+ref_offload:
+    value: true
+rejected_key:
+    value: null
+rew_add:
+    value: 0
+rew_mul:
+    value: 1
+ring_attn_size:
+    value: 4
+ring_head_stride:
+    value: 1
+save_path:
+    value: /workspace/zihan/CODE/OpenRLHF/checkpoint/Llama3.1-8b-rl-0102
+save_steps:
+    value: -1
+seed:
+    value: 42
+single_step_actor_loss:
+    value: false
+step_level:
+    value: false
+target_modules:
+    value: all-linear
+task:
+    value: math
+token_level_agent:
+    value: false
+train_batch_size:
+    value: 8
+train_file:
+    value: /workspace/zihan/CODE/mle-syn/save_data/12-31/OREO/MLInstruct_abs_rl.jsonl
+traj_actor_loss:
+    value: false
+unbiased_kl:
+    value: true
+use_wandb:
+    value: 3d0e38b972f4b849c7e75d05b4d3d86b861de97f
+wandb_group:
+    value: null
+wandb_org:
+    value: null
+wandb_project:
+    value: openrlhf_train_rl
+wandb_run_name:
+    value: exp_0107T02:43
+zero_stage:
+    value: 3
+zpg:
+    value: 1
