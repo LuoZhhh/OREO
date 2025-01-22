@@ -356,37 +356,23 @@ class PCLTrainer(ABC):
             )
         logits = outputs["logits"]
         
-        # TODO
-        if self.strategy.ring_attn_group is not None:
-            total_seq_len = ids.shape[1]
-            logits = all_gather(logits, self.strategy.ring_attn_group)
-            logits = logits.reshape(outputs["logits"].shape[0], total_seq_len, -1) # [1, total_seq_len, vocal_size]
+        # Get the current rank and local sequence length
+        rank = self.strategy.ring_attn_rank
+        total_seq_len = ids.shape[1]
+        local_seq_len = total_seq_len // self.strategy.ring_attn_size
+        local_slice = slice(rank * local_seq_len + 1, min((rank + 1) * local_seq_len + 1, labels.shape[1]))
+        # Adjust labels for the current device
+        local_labels = labels[:, local_slice]
+        if rank == self.strategy.ring_attn_size - 1:
+            logits = logits[:, :-1, :]  # Drop the last index
 
-        logits = logits[:, :-1, :]
-        labels = ids[:, 1:]  # [bsz, seq_len]
-        action_masks = action_masks[:, 1:]
-        
         logps_raw = torch.log_softmax(logits, dim=-1)
-        logps = logps_raw.gather(-1, labels.unsqueeze(-1)).squeeze(-1)
+        logps = logps_raw.gather(-1, local_labels.unsqueeze(-1)).squeeze(-1)
+        if self.strategy.ring_attn_group is not None:
+            logps = all_gather(logps, self.strategy.ring_attn_group)
+
         accumulated_logps = (logps * action_masks).flip(-1).cumsum(-1).flip(-1)
-
         return accumulated_logps, logps, logps_raw
-
-    # def forward(
-    #     self,
-    #     model,
-    #     ids: torch.Tensor,
-    #     masks: torch.Tensor,
-    #     action_masks: torch.Tensor,
-    #     critic=None,
-    # ):
-    #     outputs = model(ids, attention_mask=masks, return_output=True)
-    #     logits = outputs["logits"]
-    #     accumulated_logps = self.accumulated_logps(ids, logits, action_masks)
-    #     if critic is not None:
-    #         values = critic(ids, action_mask=action_masks, attention_mask=masks)
-    #         return accumulated_logps, values
-    #     return accumulated_logps
 
     def loss(
         self,
