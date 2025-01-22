@@ -34,6 +34,7 @@ class PCLDataset(Dataset):
         self.rew_mul = rew_mul
         self.rew_add = rew_add
         self.multiple_of = multiple_of
+        self.apply_chat_template = self.tokenizer.apply_chat_template
         # TODO: filter data samples
 
         # TODO: load real data
