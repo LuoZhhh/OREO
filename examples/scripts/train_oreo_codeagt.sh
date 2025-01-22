@@ -1,24 +1,25 @@
 set -x 
 read -r -d '' training_commands <<EOF
 examples/train_pcl.py \
-     --save_path /workspace/haoran/models/Qwen/Qwen2.5-Coder-1.5B-Instruct/ \
+     --save_path /workspace/haoran/models/test \
      --save_steps -1 \
      --logging_steps 1 \
      --eval_steps -1 \
      --train_batch_size 8 \
-     --micro_train_batch_size 1\
-     --pretrain /workspace/haoran/models/test \
+     --micro_train_batch_size 1 \
+     --pretrain /workspace/haoran/models/Qwen/Qwen2.5-Coder-1.5B-Instruct/ \
      --bf16 \
      --max_epochs 1 \
-     --max_len 1024 \
+     --max_len 32768 \
      --zero_stage 3 \
      --beta 0.03 \
-     --learning_rate  5e-6 \
+     --learning_rate 5e-6 \
      --critic_learning_rate 5e-6 \
      --adam_offload \
      --flash_attn \
      --gradient_checkpointing \
      --dro_actor_loss \
+     --step_level \
      --kl_reg 0.01 \
      --unbiased_kl \
      --ref_offload \
@@ -43,43 +44,6 @@ unset CUDA_VISIBLE_DEVICES
 if [[ ${1} != "slurm" ]]; then
     deepspeed --include $INCLUDE $training_commands
 fi
-
-# #! /bin/bash
-# set -o pipefail
-# export FORCE_TORCHRUN=0
-# python examples/train_pcl.py \
-#      --save_path /workspace/haoran/models/Qwen/Qwen2.5-Coder-1.5B-Instruct/ \
-#      --save_steps -1 \
-#      --logging_steps 1 \
-#      --eval_steps -1 \
-#      --train_batch_size 8 \
-#      --micro_train_batch_size 1\
-#      --pretrain /workspace/haoran/models/test \
-#      --bf16 \
-#      --max_epochs 1 \
-#      --max_len 1024 \
-#      --zero_stage 3 \
-#      --beta 0.03 \
-#      --learning_rate  5e-6 \
-#      --critic_learning_rate 5e-6 \
-#      --adam_offload \
-#      --flash_attn \
-#      --gradient_checkpointing \
-#      --dro_actor_loss \
-#      --kl_reg 0.01 \
-#      --unbiased_kl \
-#      --ref_offload \
-#      --plot_weights \
-#      --lora_rank 64 \
-#      --lora_alpha 64 \
-#      --padding_side left \
-#      --packing_samples \
-#      --ring_attn_size 8 \
-#      --ring_head_stride 1 \
-#      --task alfworld \
-#      --only_critic_lora \
-#      --train_file /workspace/haoran/datasets/codeagt.json
-
 
 # # #! /bin/bash
 # # set -o pipefail

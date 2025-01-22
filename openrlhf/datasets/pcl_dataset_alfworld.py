@@ -20,6 +20,7 @@ class PCLDatasetAlfWorld(PCLDataset):
 
     def __getitem__(self, index):
         conversations = self.data[index]["input"]
+        print(f'Length of conversation: {len(conversations)}')
         input_token = self.tokenizer(
             self.apply_chat_template(conversations, tokenize=False),
             max_length=self.max_length,
@@ -34,12 +35,13 @@ class PCLDatasetAlfWorld(PCLDataset):
 
         # TODO: is this the best way?
         for i in range(len(conversations)):
+            # print(f'Role: {conversations[i]["role"]}')
             if conversations[i]["role"] == "assistant":
                 prompt = self.apply_chat_template(conversations[:i], tokenize=False).rstrip()
                 idx = input_token.char_to_token(len(prompt)) # 当前 assi 回复的开始
                 if idx is None:
                     break
-                next_prompt = self.apply_chat_template(conversations[: i + 1]).rstrip()
+                next_prompt = self.apply_chat_template(conversations[:i+1], tokenize=False).rstrip()
                 assert next_prompt.startswith(prompt)
                 next_idx = input_token.char_to_token(len(next_prompt)) # 下一个 user 回复的开始
                 if self.step_level:
@@ -49,7 +51,8 @@ class PCLDatasetAlfWorld(PCLDataset):
                         state_mask[0, idx - 1 : -1] = 1
                     else:
                         state_mask[0, idx - 1 : next_idx - 1] = 1
-                action_mask[0, idx:next_idx] = 1
+                action_mask[0, idx: next_idx] = 1
+                # print(f'{idx}: {next_idx}')
 
         return (
             ids,

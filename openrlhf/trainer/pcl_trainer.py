@@ -169,9 +169,8 @@ class PCLTrainer(ABC):
                 values_detached = values.clone().detach()
 
                 with torch.no_grad():
-                    reference_accumulated_logps, reference_logps, reference_logps_raw = self.accumulated_logps(
-                        self.ref_model, ids, masks, action_masks, length
-                    )
+                    reference_accumulated_logps, reference_logps, reference_logps_raw = self.accumulated_logps(self.ref_model, ids, masks, action_masks, length)
+
                 if self.importance_sampling:
                     with torch.no_grad():
                         weights, log_weights = self.weights(logps, reference_logps, action_masks)
@@ -390,16 +389,21 @@ class PCLTrainer(ABC):
                 padding = torch.zeros((bsize, padding_length), device=logps.device, dtype=logps.dtype)
                 logps = torch.cat([logps, padding], dim=1)  # Pad to max_seq_len
 
+        # print(f"logs before: logps: {logps}")
         if self.strategy.ring_attn_group is not None:
             logps = all_gather(logps, self.strategy.ring_attn_group)
 
         # print(f'Before logps shape: {bsize}, {logps.shape}')
+        # print(f"logs middle: logps: {logps}")
         logps_chunks = torch.chunk(logps, ring_attn_size, dim=0)  # List of [bsize, seqlen_i] tensors
         logps = torch.cat(logps_chunks, dim=1).view(bsize, -1)
         logps = logps[:, :-1] # remove the last token for padding
+        # print(f"logs after: logps: {logps}")
+        # print(f'mask sum: {torch.sum(action_masks)}')
         # print(f'After logps shape: {logps.shape}, {action_masks.shape}')
         accumulated_logps = (logps * action_masks).flip(-1).cumsum(-1).flip(-1)
-        return accumulated_logps, logps, logps_raw        
+        # print(f"accumulated_logps: {accumulated_logps}")
+        return accumulated_logps, logps, logps_raw
 
     def loss(
         self,

@@ -141,17 +141,14 @@ class PCLDataset(Dataset):
         
         index = 1
         for ids, masks, state_masks, action_masks, rewards, length in item_list:
-            # 展平并连接所有序列
             packed_ids.append(ids.flatten())
-            # 使用序列索引标记不同序列
             packed_masks.append(torch.full_like(ids.flatten(), index))
             packed_state_masks.append(state_masks.flatten())
             packed_action_masks.append(action_masks.flatten())
             packed_rewards.append(rewards)
             packed_lengths.append(length)
             index += 1
-        
-        # 连接所有序列
+
         packed_ids = torch.cat(packed_ids, dim=0).unsqueeze(0)
         packed_masks = torch.cat(packed_masks, dim=0).unsqueeze(0)
         packed_state_masks = torch.cat(packed_state_masks, dim=0).unsqueeze(0)
@@ -159,13 +156,19 @@ class PCLDataset(Dataset):
         packed_rewards = torch.cat(packed_rewards, dim=0).unsqueeze(1)
         packed_lengths = torch.cat(packed_lengths, dim=0).tolist()
         
-        # 处理序列长度对齐
         if self.multiple_of > 1 and packed_ids.numel() % self.multiple_of != 0:
             padding_len = self.multiple_of - (packed_ids.numel() % self.multiple_of)
-            packed_ids = F.pad(packed_ids, (0, padding_len), value=self.tokenizer.pad_token_id)  #当pad只有两个参数时，仅改变最后一个维度，左边扩充0列
+            packed_ids = F.pad(packed_ids, (0, padding_len), value=self.tokenizer.pad_token_id)
             packed_masks = F.pad(packed_masks, (0, padding_len), value=0)
             packed_state_masks = F.pad(packed_state_masks, (0, padding_len), value=0)
             packed_action_masks = F.pad(packed_action_masks, (0, padding_len), value=0)
+            
+        # print("packed_ids", packed_ids)
+        # print("packed_masks", packed_masks)
+        # print("packed_state_masks", packed_state_masks)
+        # print("packed_action_masks", packed_action_masks)
+        # print("packed_rewards", packed_rewards)
+        # print("packed_lengths", packed_lengths)
         
         return packed_ids, packed_masks, packed_state_masks, packed_action_masks, packed_rewards, packed_lengths
 
