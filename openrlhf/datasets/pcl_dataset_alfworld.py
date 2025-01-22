@@ -8,6 +8,7 @@ from .pcl_dataset import PCLDataset
 
 class PCLDatasetAlfWorld(PCLDataset):
     def load_data(self, split: str, train_file: str | None = None):
+        split = "train"
         if split == "train":
             assert train_file is not None
             filepath = train_file
@@ -18,7 +19,7 @@ class PCLDatasetAlfWorld(PCLDataset):
             self.data = json.load(f)
 
     def __getitem__(self, index):
-        conversations = self.data[index]["conversations"]
+        conversations = self.data[index]["input"]
         input_token = self.tokenizer(
             self.apply_chat_template(conversations, tokenize=False),
             max_length=self.max_length,

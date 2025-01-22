@@ -250,6 +250,17 @@ class PCLTrainer(ABC):
                             kls_actor = F.kl_div(
                                 logps_raw, reference_logps_raw, reduction="none", log_target=True
                             ).sum(dim=-1)
+                        # print('kls_actor before', kls_actor.shape)
+                        bsize = kls_actor.shape[0]
+                        if self.strategy.ring_attn_rank == self.strategy.ring_attn_size - 1:
+                            padding_length = 1
+                            padding = torch.zeros((bsize, padding_length), device=kls_actor.device, dtype=kls_actor.dtype)
+                            kls_actor = torch.cat([kls_actor, padding], dim=1)
+                        kls_actor = all_gather(kls_actor, self.strategy.ring_attn_group)
+                        kls_chunks = torch.chunk(kls_actor, self.strategy.ring_attn_size, dim=0) 
+                        kls_actor = torch.cat(kls_chunks, dim=1).view(bsize, -1)
+                        kls_actor = kls_actor[:, :-1]
+                        # print('kls_actor after', kls_actor.shape)
                         kl_estimate_actor = torch.mean(
                             (kls_actor * action_masks[:, 1:]).sum(dim=-1) / action_masks[:, 1:].sum(dim=-1)
                         )
@@ -355,24 +366,40 @@ class PCLTrainer(ABC):
                 packed_seq_lens=length,
             )
         logits = outputs["logits"]
-        
-        # Get the current rank and local sequence length
+
+        labels = ids
+        action_masks = action_masks[:, 1:]
         rank = self.strategy.ring_attn_rank
         total_seq_len = ids.shape[1]
         local_seq_len = total_seq_len // self.strategy.ring_attn_size
         local_slice = slice(rank * local_seq_len + 1, min((rank + 1) * local_seq_len + 1, labels.shape[1]))
+        # print('labels', labels.shape, local_slice, rank, self.strategy.ring_attn_size)
         # Adjust labels for the current device
         local_labels = labels[:, local_slice]
         if rank == self.strategy.ring_attn_size - 1:
             logits = logits[:, :-1, :]  # Drop the last index
-
+        bsize = logits.shape[0]
         logps_raw = torch.log_softmax(logits, dim=-1)
         logps = logps_raw.gather(-1, local_labels.unsqueeze(-1)).squeeze(-1)
+
+        ring_attn_size = self.strategy.ring_attn_size
+        if rank == self.strategy.ring_attn_size - 1:
+            max_seq_len = local_seq_len  # Assume local_seq_len is the max length across ranks
+            padding_length = max_seq_len - logps.size(1)  # Calculate how much padding is needed
+            if padding_length > 0:
+                padding = torch.zeros((bsize, padding_length), device=logps.device, dtype=logps.dtype)
+                logps = torch.cat([logps, padding], dim=1)  # Pad to max_seq_len
+
         if self.strategy.ring_attn_group is not None:
             logps = all_gather(logps, self.strategy.ring_attn_group)
 
+        # print(f'Before logps shape: {bsize}, {logps.shape}')
+        logps_chunks = torch.chunk(logps, ring_attn_size, dim=0)  # List of [bsize, seqlen_i] tensors
+        logps = torch.cat(logps_chunks, dim=1).view(bsize, -1)
+        logps = logps[:, :-1] # remove the last token for padding
+        # print(f'After logps shape: {logps.shape}, {action_masks.shape}')
         accumulated_logps = (logps * action_masks).flip(-1).cumsum(-1).flip(-1)
-        return accumulated_logps, logps, logps_raw
+        return accumulated_logps, logps, logps_raw        
 
     def loss(
         self,
